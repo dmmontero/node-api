@@ -1,9 +1,9 @@
 require('./config/config')
 const express = require("express");
+const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT;
 const bodyParser = require('body-parser');
-
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -12,41 +12,20 @@ app.use(bodyParser.urlencoded({
 // parse application/json
 app.use(bodyParser.json());
 
-app.get("/usuario", (req, res) => {
-    res.json("get Usuario");
+app.use(require('./routes/routes'));
+
+
+mongoose.connect(process.env.urlDB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
 });
 
-app.post("/usuario", (req, res) => {
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
 
-    let body = req.body;
-
-    if (body.nombre == undefined) {
-
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es necesario'
-        })
-    }
-
-    res.json({
-        persona: body
-    });
-});
-
-app.put("/usuario/:id", (req, res) => {
-    let id = req.params.id;
-
-    res.json({
-        id
-    });
-});
-
-app.patch("/usuario", (req, res) => {
-    res.json("pacth Usuario");
-});
-
-app.delete("/usuario", (req, res) => {
-    res.json("delete Usuario");
+db.once('open', function () {
+    console.log(`we are connected to ${process.env.urlDB}`);
 });
 
 app.listen(port, () =>
