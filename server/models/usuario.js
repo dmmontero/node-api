@@ -2,10 +2,10 @@ const mongoose = require('mongoose'); // Erase if already required
 const uniqueValidator = require('mongoose-unique-validator'); // Mongoose validator
 
 let Roles = {
-        values: ['ADMIN_ROLE', 'USER_ROLE'],
-        message: '{VALUE} Rol no válido'
-    }
-    // Declare the Schema of the Mongo model
+    values: ['ADMIN_ROLE', 'USER_ROLE'],
+    message: '{VALUE} Rol no válido'
+}
+// Declare the Schema of the Mongo model
 var usuarioSchema = new mongoose.Schema({
     nombre: {
         type: String,
@@ -43,7 +43,7 @@ usuarioSchema.plugin(uniqueValidator, {
     message: '{PATH} debe ser único'
 });
 
-usuarioSchema.methods.toJSON = function() {
+usuarioSchema.methods.toJSON = function () {
     let user = this;
     let userObject = user.toObject();
     delete userObject.password;

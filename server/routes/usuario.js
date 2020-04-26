@@ -1,11 +1,16 @@
 const express = require("express");
-const app = express();
 const Usuario = require("../models/usuario");
+const {
+    verificaToken,
+    verificaAdminRole
+} = require("../middlewares/authentication");
+const app = express();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const _ = require("underscore");
 
-app.get("/usuario", (req, res) => {
+app.get("/usuario", verificaToken, (req, res) => {
+
     let desde = req.query.desde || 0;
     desde = Number(desde);
 
@@ -40,7 +45,7 @@ app.get("/usuario", (req, res) => {
         });
 });
 
-app.post("/usuario", (req, res) => {
+app.post("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
     let body = req.body;
 
     let usuario = new Usuario({
@@ -64,9 +69,12 @@ app.post("/usuario", (req, res) => {
     });
 });
 
-app.put("/usuario/:id", (req, res) => {
+app.put("/usuario/:id", [verificaToken, verificaAdminRole], (req, res) => {
+
     let id = req.params.id;
-    let body = _.pick(req.body, ["nombre", "email", "img", "role", "estado"]);
+    let body = _.pick(req.body, ["nombre", "email", "img", "role", "estado", "password"]);
+
+    body.password = bcrypt.hashSync(body.password, saltRounds);
 
     Usuario.findByIdAndUpdate(
         id,
@@ -89,11 +97,11 @@ app.put("/usuario/:id", (req, res) => {
     );
 });
 
-app.patch("/usuario", (req, res) => {
+app.patch("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
     res.json("pacth Usuario");
 });
 
-app.delete("/usuario", (req, res) => {
+app.delete("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
     let id = req.body.id;
 
     Usuario.findByIdAndDelete(id, (err, usuarioDB) => {
@@ -120,7 +128,7 @@ app.delete("/usuario", (req, res) => {
     });
 });
 
-app.delete("/usuario/:id", (req, res) => {
+app.delete("/usuario/:id", verificaToken, (req, res) => {
     let id = req.params.id;
 
     let estado = {
