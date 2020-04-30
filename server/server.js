@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT;
 const bodyParser = require('body-parser');
+const path = require('path');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -13,6 +14,8 @@ app.use(bodyParser.urlencoded({
 // parse application/json
 app.use(bodyParser.json());
 
+//habilitar carpeta public para que sea publica
+app.use(express.static(path.resolve(__dirname, '../public')));
 
 //Rutas de la API
 app.use(require('./routes/index'));
