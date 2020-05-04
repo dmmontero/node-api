@@ -45,6 +45,9 @@ app.get("/usuario", verificaToken, (req, res) => {
         });
 });
 
+/**
+ * Cear Usuario
+ */
 app.post("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
     let body = req.body;
 
@@ -56,9 +59,18 @@ app.post("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
     });
 
     usuario.save((err, usuarioDB) => {
+
         if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!usuarioDB) {
             return res.status(400).json({
-                err,
+                ok: false,
+                err
             });
         }
 
@@ -69,12 +81,16 @@ app.post("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
     });
 });
 
+/**
+ * Actualizar usuario
+ */
 app.put("/usuario/:id", [verificaToken, verificaAdminRole], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ["nombre", "email", "img", "role", "estado", "password"]);
 
-    body.password = bcrypt.hashSync(body.password, saltRounds);
+    if (body.password)
+        body.password = bcrypt.hashSync(body.password, saltRounds);
 
     Usuario.findByIdAndUpdate(
         id,
@@ -83,6 +99,7 @@ app.put("/usuario/:id", [verificaToken, verificaAdminRole], (req, res) => {
             runValidators: true,
         },
         (err, usuarioDB) => {
+
             if (err) {
                 return res.status(400).json({
                     err,
@@ -102,6 +119,7 @@ app.patch("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
 });
 
 app.delete("/usuario", [verificaToken, verificaAdminRole], (req, res) => {
+
     let id = req.body.id;
 
     Usuario.findByIdAndDelete(id, (err, usuarioDB) => {
@@ -138,11 +156,12 @@ app.delete("/usuario/:id", verificaToken, (req, res) => {
     Usuario.findByIdAndUpdate(
         id,
         estado, {
-            new: true,
+            new: true
         },
         (err, usuarioDB) => {
+
             if (err) {
-                return res.status(400).json({
+                return res.status(500).json({
                     err,
                 });
             }

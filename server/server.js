@@ -25,6 +25,7 @@ mongoose.connect(process.env.urlDB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false
 });
 
 const db = mongoose.connection;
